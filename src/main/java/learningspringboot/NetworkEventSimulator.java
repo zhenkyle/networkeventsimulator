@@ -6,14 +6,19 @@ import java.util.Random;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import org.springframework.boot.actuate.metrics.CounterService;
+
 public class NetworkEventSimulator {
 
 	final private JmsTemplate jmsTemplate;
 	final private String destination;
+	final private CounterService counterService;
 
-	public NetworkEventSimulator(JmsTemplate jmsTemplate, String dest) {
+	public NetworkEventSimulator(JmsTemplate jmsTemplate, String dest,
+								CounterService counterService) {
 		this.jmsTemplate = jmsTemplate;
 		this.destination = dest;
+		this.counterService = counterService;
 	}
 
 	@Scheduled(fixedRate = 1000L)
@@ -39,5 +44,8 @@ public class NetworkEventSimulator {
 		Alarm event = new Alarm(hostname, LocalDateTime.now(),
 			severity);
 		jmsTemplate.convertAndSend(destination, event);
+		counterService.increment("messages.total.produced");
+		counterService.increment("messages." + event.getHostname() +
+	".produced");
 	}
 }

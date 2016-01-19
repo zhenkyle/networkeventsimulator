@@ -10,6 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.jms.listener.adapter.MessageListenerAdapter;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.actuate.metrics.CounterService;
 
 @Configuration
 @ComponentScan
@@ -39,8 +40,9 @@ public class Application {
 	}
 
 	@Bean
-	NetworkEventSimulator simulator(JmsTemplate jmsTemplate) {
-		return new NetworkEventSimulator(jmsTemplate, MAILBOX);
+	NetworkEventSimulator simulator(JmsTemplate jmsTemplate,
+		CounterService counterService) {
+		return new NetworkEventSimulator(jmsTemplate, MAILBOX, counterService);
 	}
 
 	public static void main(String[] args) {
